@@ -157,10 +157,12 @@ pipeline {
         }
 
         stage('Docker Image Scan') {
-            steps {
-                sh "trivy image --format table -o trivy-image-report.html $DOCKER_IMAGE"
-            }
-        }
+    steps {
+        sh '''
+            /var/lib/jenkins/bin/trivy image --format table -o trivy-image-report.html $ECR_REPOSITORY_URL:$BUILD_NUMBER
+        '''
+    }
+}
 
         stage('Push Docker Image To ECR') {
             steps {
