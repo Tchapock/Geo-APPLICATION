@@ -26,7 +26,8 @@ pipeline {
         APP_OWNER = 'cloud_team'
         BRANCH_NAME = 'main'
         KUBE_NAMESPACE = 'webapps'
-
+        TRIVY_CACHE_DIR = '/var/lib/jenkins/.cache/trivy'
+        TMPDIR = '/var/lib/jenkins/tmp'
         // Docker / AWS ECR image variables
         DOCKER_IMAGE = "${ECR_REPOSITORY_URL}:${BUILD_NUMBER}"
         DOCKER_IMAGE_LATEST = "${ECR_REPOSITORY_URL}:latest"
@@ -83,10 +84,18 @@ pipeline {
     }
 }
         
-      stage('File System Scan') {
+    stage('File System Scan') {
     steps {
         sh '''
-            /var/lib/jenkins/bin/trivy fs --format table -o trivy-fs-report.html .
+            mkdir -p /var/lib/jenkins/tmp
+            mkdir -p /var/lib/jenkins/.cache/trivy
+
+            export TMPDIR=/var/lib/jenkins/tmp
+            export TRIVY_CACHE_DIR=/var/lib/jenkins/.cache/trivy
+
+            /var/lib/jenkins/bin/trivy fs \
+              --format table \
+              -o trivy-fs-report.html .
         '''
     }
 }
@@ -156,10 +165,19 @@ pipeline {
             }
         }
 
-        stage('Docker Image Scan') {
+      stage('Docker Image Scan') {
     steps {
         sh '''
-            /var/lib/jenkins/bin/trivy image --format table -o trivy-image-report.html $ECR_REPOSITORY_URL:$BUILD_NUMBER
+            mkdir -p /var/lib/jenkins/tmp
+            mkdir -p /var/lib/jenkins/.cache/trivy
+
+            export TMPDIR=/var/lib/jenkins/tmp
+            export TRIVY_CACHE_DIR=/var/lib/jenkins/.cache/trivy
+
+            /var/lib/jenkins/bin/trivy image \
+              --format table \
+              -o trivy-image-report.html \
+              $ECR_REPOSITORY_URL:$BUILD_NUMBER
         '''
     }
 }
