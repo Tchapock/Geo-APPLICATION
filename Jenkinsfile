@@ -69,21 +69,23 @@ pipeline {
         stage('Install Trivy') {
     steps {
         sh '''
-            if ! command -v trivy >/dev/null 2>&1; then
-                echo "Installing Trivy..."
-                curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+            mkdir -p $WORKSPACE/bin
+
+            if [ ! -x "$WORKSPACE/bin/trivy" ]; then
+                echo "Installing Trivy in Jenkins workspace..."
+                curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sh -s -- -b $WORKSPACE/bin
             else
-                echo "Trivy already installed."
+                echo "Trivy already installed in workspace."
             fi
 
-            trivy --version
+            $WORKSPACE/bin/trivy --version
         '''
     }
 }
         
         stage('File System Scan') {
             steps {
-                sh "trivy fs --format table -o trivy-fs-report.html ."
+                sh "$WORKSPACE/bin/trivy fs --format table -o trivy-fs-report.html ."
             }
         }
 
