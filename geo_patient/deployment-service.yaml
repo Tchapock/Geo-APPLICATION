@@ -1,0 +1,34 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: geo-patient-app
+  namespace: webapps
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: geo-patient-app
+  template:
+    metadata:
+      labels:
+        app: geo-patient-app
+    spec:
+      containers:
+        - name: geo-patient-app
+          image: IMAGE_PLACEHOLDER
+          ports:
+            - containerPort: 8080
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: geo-patient-service
+  namespace: webapps
+spec:
+  selector:
+    app: geo-patient-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 8080
+  type: LoadBalancer
