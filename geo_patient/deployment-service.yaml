@@ -17,7 +17,7 @@ spec:
         - name: geo-patient-app
           image: IMAGE_PLACEHOLDER
           ports:
-            - containerPort: 8080
+            - containerPort: 8087
 ---
 apiVersion: v1
 kind: Service
@@ -30,5 +30,5 @@ spec:
   ports:
     - protocol: TCP
       port: 80
-      targetPort: 8080
+      targetPort: 8087
   type: LoadBalancer
