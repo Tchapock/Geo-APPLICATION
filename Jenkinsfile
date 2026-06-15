@@ -45,13 +45,14 @@ pipeline {
         HELMARTIFACTTARGET = "helm/geo-app-${BUILD_ID}.tgz"
     }
 
-   stage('Git Checkout') {
-    steps {
-        git branch: 'main',
-            credentialsId: 'git-cred',
-            url: 'https://github.com/Tchapock/Geo-APPLICATION.git'
-    }
-}
+    stages {
+        stage('Git Checkout') {
+            steps {
+                git branch: "${BRANCH_NAME}",
+                    credentialsId: "${GIT_CRED}",
+                    url: ''
+            }
+        }
 
         stage('Compile') {
             steps {
