@@ -105,12 +105,12 @@ pipeline {
         }
 
         stage('Quality Gate') {
-            steps {
-                script {
-                    waitForQualityGate abortPipeline: false, credentialsId: "${SONARQUBE_CRED}"
-                }
-            }
+    steps {
+        timeout(time: 2, unit: 'MINUTES') {
+            waitForQualityGate abortPipeline: false
         }
+    }
+}
 
         stage('Build') {
             steps {
