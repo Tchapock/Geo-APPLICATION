@@ -200,16 +200,24 @@ pipeline {
         }
 
         stage('Deploy To Kubernetes') {
-            steps {
-                sh '''
-                    kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+    steps {
+        dir('geo_patient') {
+            sh '''
+                echo "Current directory:"
+                pwd
 
-                    sed -i "s|image: .*|image: ${DOCKER_IMAGE_LATEST}|g" deployment-service.yaml
+                echo "Files here:"
+                ls -la
 
-                    kubectl apply -f deployment-service.yaml -n $KUBE_NAMESPACE
-                '''
-            }
+                kubectl create namespace $KUBE_NAMESPACE --dry-run=client -o yaml | kubectl apply -f -
+
+                sed -i "s|image: .*|image: ${DOCKER_IMAGE_LATEST}|g" deployment-service.yaml
+
+                kubectl apply -f deployment-service.yaml -n $KUBE_NAMESPACE
+            '''
         }
+    }
+}
 
         stage('Verify the Deployment') {
             steps {
