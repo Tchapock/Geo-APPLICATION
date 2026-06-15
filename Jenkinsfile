@@ -66,6 +66,21 @@ pipeline {
             }
         }
 
+        stage('Install Trivy') {
+    steps {
+        sh '''
+            if ! command -v trivy >/dev/null 2>&1; then
+                echo "Installing Trivy..."
+                curl -sfL https://raw.githubusercontent.com/aquasecurity/trivy/main/contrib/install.sh | sudo sh -s -- -b /usr/local/bin
+            else
+                echo "Trivy already installed."
+            fi
+
+            trivy --version
+        '''
+    }
+}
+        
         stage('File System Scan') {
             steps {
                 sh "trivy fs --format table -o trivy-fs-report.html ."
