@@ -48,8 +48,8 @@ pipeline {
     stages {
         stage('Git Checkout') {
             steps {
-                git branch: "${BRANCH_NAME}",
-                    credentialsId: "${GIT_CRED}",
+                git branch: "main",
+                    credentialsId: "tchapo"
                     url: 'https://github.com/Tchapock/Geo-APPLICATION.git'
             }
         }
