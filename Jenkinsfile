@@ -14,9 +14,9 @@ pipeline {
         EKS_CLUSTER_NAME = 'clean-cicd-eks'
 
         // Server URLs from Terraform output
-        JENKINS_URL = 'http://54.173.114.100:8080'
-        JFROG_URL = 'http://13.221.23.57:8082'
-        SONARQUBE_URL = 'http://52.91.240.117:9000'
+        JENKINS_URL = 'http://34.230.61.69:8080'
+        JFROG_URL = 'http://3.94.101.203:8082'
+        SONARQUBE_URL = 'http://3.86.154.83:9000'
 
         // Jenkins tool name
         SCANNER_HOME = tool 'sonar'
