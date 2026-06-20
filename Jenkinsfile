@@ -88,20 +88,33 @@ pipeline {
             }
         }
 
-        stage('SonarQube Analysis') {
-            steps {
-                withSonarQubeEnv("${SONARQUBE_INSTALLATION}") {
-                    sh '''
-                        $SCANNER_HOME/bin/sonar-scanner \
-                        -Dsonar.projectName=Geo-Application \
-                        -Dsonar.projectKey=Geo-Application \
-                        -Dsonar.sources=. \
-                        -Dsonar.java.binaries=target/classes
-                    '''
-                }
-            }
-        }
+       stage('SonarQube Analysis') {
+    steps {
+        withSonarQubeEnv("${SONARQUBE_INSTALLATION}") {
+            sh '''
+                set -x
 
+                echo "SONARQUBE_INSTALLATION is: $SONARQUBE_INSTALLATION"
+                echo "SCANNER_HOME is: $SCANNER_HOME"
+                echo "JAVA_HOME is: $JAVA_HOME"
+
+                echo "Checking scanner folder..."
+                ls -la $SCANNER_HOME
+                ls -la $SCANNER_HOME/bin
+
+                echo "Checking sonar-scanner version..."
+                $SCANNER_HOME/bin/sonar-scanner --version
+
+                echo "Running SonarQube scan..."
+                $SCANNER_HOME/bin/sonar-scanner \
+                  -Dsonar.projectName=Geo-Application \
+                  -Dsonar.projectKey=Geo-Application \
+                  -Dsonar.sources=. \
+                  -Dsonar.java.binaries=target/classes
+            '''
+        }
+    }
+}
         stage('Quality Gate') {
             steps {
                 timeout(time: 10, unit: 'MINUTES') {
