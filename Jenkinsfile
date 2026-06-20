@@ -12,9 +12,9 @@ pipeline {
         ECR_REPOSITORY_URL = '440744242159.dkr.ecr.us-east-1.amazonaws.com/clean-cicd-aws-app-repo'
         EKS_CLUSTER_NAME = 'clean-cicd-eks'
 
-        JENKINS_URL = 'http://34.230.61.69:8080'
-        JFROG_URL = 'http://3.94.101.203:8082'
-        SONARQUBE_URL = 'http://3.86.154.83:9000'
+        JENKINS_URL = 'http://44.202.157.49:8080'
+        JFROG_URL = 'http://44.203.176.52:8082'
+        SONARQUBE_URL = 'http://34.238.43.181:9000'
 
         SCANNER_HOME = tool 'sonar'
 
