@@ -37,7 +37,7 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 git branch: 'main',
-                    credentialsId: "lili",
+                    credentialsId: "${GIT_CRED}",
                     url: 'https://github.com/Tchapock/Geo-APPLICATION.git'
             }
         }
@@ -82,37 +82,39 @@ pipeline {
                     export TRIVY_CACHE_DIR=/var/lib/jenkins/.cache/trivy
 
                     /var/lib/jenkins/bin/trivy fs \
+                      --scanners vuln \
                       --format table \
-                      -o trivy-fs-report.html .
+                      -o trivy-fs-report.txt .
                 '''
             }
         }
 
-    stage('SonarQube Analysis') {
-    steps {
-        withCredentials([string(credentialsId: 'sonar-token', variable: 'SONAR_TOKEN')]) {
-            withSonarQubeEnv("${SONARQUBE_INSTALLATION}") {
-                sh '''
-                    echo "Running SonarQube Analysis..."
-                    echo "SCANNER_HOME is: $SCANNER_HOME"
-                    echo "Checking scanner..."
-                    ls -la $SCANNER_HOME/bin
+        stage('SonarQube Analysis') {
+            steps {
+                withSonarQubeEnv("${SONARQUBE_INSTALLATION}") {
+                    sh '''
+                        echo "Running SonarQube Analysis..."
+                        echo "SCANNER_HOME is: $SCANNER_HOME"
+                        echo "Checking scanner path..."
+                        ls -la $SCANNER_HOME/bin
 
-                    $SCANNER_HOME/bin/sonar-scanner \
-                      -Dsonar.projectName=Geo-Application \
-                      -Dsonar.projectKey=Geo-Application \
-                      -Dsonar.sources=. \
-                      -Dsonar.java.binaries=target/classes \
-                      -Dsonar.login=$SONAR_TOKEN
-                '''
+                        $SCANNER_HOME/bin/sonar-scanner \
+                          -Dsonar.projectName=Geo-Application \
+                          -Dsonar.projectKey=Geo-Application \
+                          -Dsonar.sources=. \
+                          -Dsonar.java.binaries=target/classes
+                    '''
+                }
             }
         }
-    }
-}
+
         stage('Quality Gate') {
             steps {
-                timeout(time: 10, unit: 'MINUTES') {
-                    waitForQualityGate abortPipeline: false
+                timeout(time: 30, unit: 'MINUTES') {
+                    script {
+                        def qg = waitForQualityGate abortPipeline: false
+                        echo "Quality Gate status: ${qg.status}"
+                    }
                 }
             }
         }
@@ -148,8 +150,9 @@ pipeline {
                     export TRIVY_CACHE_DIR=/var/lib/jenkins/.cache/trivy
 
                     /var/lib/jenkins/bin/trivy image \
+                      --scanners vuln \
                       --format table \
-                      -o trivy-image-report.html \
+                      -o trivy-image-report.txt \
                       $DOCKER_IMAGE
                 '''
             }
@@ -205,9 +208,11 @@ pipeline {
 
     post {
         always {
-            archiveArtifacts artifacts: 'trivy-fs-report.html,trivy-image-report.html', allowEmptyArchive: true
-
             script {
+                if (fileExists('trivy-fs-report.txt') || fileExists('trivy-image-report.txt')) {
+                    archiveArtifacts artifacts: 'trivy-fs-report.txt,trivy-image-report.txt', allowEmptyArchive: true
+                }
+
                 def jobName = env.JOB_NAME
                 def buildNumber = env.BUILD_NUMBER
                 def pipelineStatus = currentBuild.result ?: 'SUCCESS'
@@ -234,7 +239,7 @@ pipeline {
                     from: 'jenkins@example.com',
                     replyTo: 'jenkins@example.com',
                     mimeType: 'text/html',
-                    attachmentsPattern: 'trivy-fs-report.html,trivy-image-report.html'
+                    attachmentsPattern: 'trivy-fs-report.txt,trivy-image-report.txt'
                 )
             }
         }
