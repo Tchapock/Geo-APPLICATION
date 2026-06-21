@@ -29,7 +29,7 @@ pipeline {
         DOCKER_IMAGE = "${ECR_REPOSITORY_URL}:${BUILD_NUMBER}"
         DOCKER_IMAGE_LATEST = "${ECR_REPOSITORY_URL}:latest"
 
-        GIT_CRED = 'tchapi'
+        GIT_CRED = 'lili'
         SONARQUBE_INSTALLATION = 'sonar'
     }
 
@@ -37,7 +37,7 @@ pipeline {
         stage('Git Checkout') {
             steps {
                 git branch: 'main',
-                    credentialsId: "loulou",
+                    credentialsId: "lili",
                     url: 'https://github.com/Tchapock/Geo-APPLICATION.git'
             }
         }
