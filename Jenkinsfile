@@ -95,8 +95,7 @@ pipeline {
                 sh '''
                     echo "Running SonarQube Analysis..."
                     echo "SCANNER_HOME is: $SCANNER_HOME"
-                    echo "SONAR_TOKEN exists"
-
+                    echo "Checking scanner..."
                     ls -la $SCANNER_HOME/bin
 
                     $SCANNER_HOME/bin/sonar-scanner \
